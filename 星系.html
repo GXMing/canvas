@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="keywords" content=""/>
+    <meta name="description" contetn=""/>
+    <title></title>
+    <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript">
+    $(function(){
+        "use strict"
+        /*******************************
+            画图
+        ***************************************/
+        function draw(){
+            var canvas = document.getElementById("canvas");
+            var ctx = canvas.getContext("2d");
+            //ctx.fillStyle = "rgb(255,255,255)"       //fill 填充   stroke路径
+            ctx.strokeStyle = "rgb(255,255,255)"
+            ctx.beginPath();  
+            ctx.arc(500,500,200,0,Math.PI*2,false)    
+            //500,500确定中心点   
+            //499确定半径   
+            //0圆的开始点（按圆的长度大小，0为3点钟方向，单位是弧度）  
+            //Math.PI*2结束点（Math.PI为圆的一半）  false（控制顺时针逆时针）
+            ctx.stroke();      //划出路径(路径不闭合)
+            //ctx.closePath();      //闭合路径（路径闭合）
+            //ctx.fill()       //填充路径
+        }
+        draw();
+        // 
+        /*****************************************************
+            1
+        *****************************************************/
+    // var Tarr = [1,3,388,6];
+    // function fc(a){
+    //     console.log(a);
+    // }
+    // function makeClosures(arr,fn){
+    //     var Tarr2 = [];
+    //     for(let i =0;i<arr.length;i++){
+    //         Tarr2[i] = function(){
+    //             return fn(arr[i])
+    //         };
+    //     }
+    //     return Tarr2; 
+    // }
+    /*************************************************************
+        2
+    ******************************************************/
+    var btn = document.getElementsByClassName("btn")
+
+        function startRoute(){
+            for(var i=0; i<btn.length; i++){
+               (function(a){
+                    btn[i].onclick = function(){
+                        alert(a+1)
+                    }
+               }(i))
+            }
+        };
+        startRoute();
+    });
+
+
+    </script>
+</head>
+<body>
+    
+    <canvas id="canvas" width="1000px" height="1000px" style="margin:0 auto;display:block;background-color:#222;"></canvas>
+    <button id="btn1" class="btn">1</button>
+    <button id="btn2" class="btn">2</button>
+    <button id="btn3" class="btn">3</button>
+    
+    
+</body>
+</html>
