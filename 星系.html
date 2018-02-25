@@ -95,7 +95,7 @@
                         cxt.arc(0,0,30,0,2*Math.PI,false);
                         cxt.stroke();
                         cxt.closePath();
-                        //月球圆心坐标
+                        //月球圆心坐标 //(time*360/this.revolution-90) 角度！！！！
                         var x = 30*Math.cos((time*360/this.revolution-90)*Math.PI/180);
                         var y = 30*Math.sin((time*360/this.revolution-90)*Math.PI/180);
                         cxt.rotate(time*360/this.revolution*Math.PI/180);
