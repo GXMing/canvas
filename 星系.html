@@ -15,18 +15,154 @@
         ***************************************/
         function draw(){
             var canvas = document.getElementById("canvas");
-            var ctx = canvas.getContext("2d");
-            //ctx.fillStyle = "rgb(255,255,255)"       //fill 填充   stroke路径
-            ctx.strokeStyle = "rgb(255,255,255)"
-            ctx.beginPath();  
-            ctx.arc(500,500,200,0,Math.PI*2,false)    
-            //500,500确定中心点   
-            //499确定半径   
-            //0圆的开始点（按圆的长度大小，0为3点钟方向，单位是弧度）  
-            //Math.PI*2结束点（Math.PI为圆的一半）  false（控制顺时针逆时针）
-            ctx.stroke();      //划出路径(路径不闭合)
-            //ctx.closePath();      //闭合路径（路径闭合）
-            //ctx.fill()       //填充路径
+            var cxt = canvas.getContext("2d");
+            var time = 0;
+            var EarchRotate = 0;
+            var MoonX = 0;
+            var MoonY = 0;
+            // //cxt.fillStyle = "rgb(255,255,255)"       //fill 填充   stroke路径
+            // cxt.strokeStyle = "rgb(255,255,255)"
+            // cxt.beginPath();  //丢弃路径 开始新路径 
+            // cxt.arc(500,500,200,0,Math.PI*2,false)    
+            // //500,500确定中心点   
+            // //499确定半径   
+            // //0圆的开始点（按圆的长度大小，0为3点钟方向，单位是弧度）  
+            // //Math.PI*2结束点（Math.PI为圆的一半）  false（控制顺时针逆时针）
+            // cxt.stroke();      //划出路径(路径不闭合)
+            // //cxt.closePath();      //闭合路径（路径闭合）
+            // //cxt.fill()       //填充路径
+            //
+            function starRoute(){
+                for(var i=0; i<=8 ; i++){
+                    cxt.save();  //保存画布的状态
+                    cxt.strokeStyle = "#fff";
+                    cxt.translate(500,500);   //画布中心点
+                    cxt.beginPath();
+                    cxt.arc(0,0,i*55,0,2*Math.PI,false);
+                    cxt.closePath();
+                    cxt.stroke();
+                    cxt.restore();  //恢复画布的状态  
+                }
+            }
+            starRoute();
+
+            //创建对象
+            function Star(name,x,y,r,strartColor,endColor,revolution){
+                this.name = name;  //行星名
+                this.x = x;   //圆心
+                this.y = y; 
+                this.r = r;  //半径 r
+                this.strartColor = strartColor; //渐变颜色
+                this.endColor = endColor;
+                this.revolution = revolution; //公转周期
+            }
+
+            Star.prototype = {
+                constructor : Star,
+                drawStar : function(){
+                    cxt.save();
+                    cxt.translate(500,500);
+                    //填充颜色
+                    var gradient = cxt.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r);
+                        // context.createRadialGradient(x0,y0,r0,x1,y1,r1);
+                        // 参数值
+                        // 参数  描述
+                        // x0  渐变的开始圆的 x 坐标
+                        // y0  渐变的开始圆的 y 坐标
+                        // r0  开始圆的半径
+                        // x1  渐变的结束圆的 x 坐标
+                        // y1  渐变的结束圆的 y 坐标
+                        // r1  结束圆的半径
+                    gradient.addColorStop(0,this.strartColor);
+                    gradient.addColorStop(1,this.endColor);
+                    cxt.fillStyle = gradient;
+                    cxt.beginPath(); //开始新路径
+                    //画圆
+                    if(this.name == "地球"){
+                        EarchRotate = time*360/this.revolution*Math.PI/180;  
+                        MoonX = 165*Math.sin(EarchRotate);
+                        MoonY = -165*Math.cos(EarchRotate);
+                        cxt.rotate(time*360/this.revolution*Math.PI/180);
+                        cxt.arc(this.x,this.y,this.r,0,2*Math.PI,false);
+                        cxt.fill();
+                    }else if(this.name == "月球"){
+                        cxt.save();
+                        cxt.translate(MoonX,MoonY);
+                        //重置原点，即设置月球旋转中心
+                        //月球旋转轨迹
+                        cxt.beginPath();
+                        cxt.strokeStyle = 'rgba(207,207,207,0.2)';
+                        cxt.arc(0,0,30,0,2*Math.PI,false);
+                        cxt.stroke();
+                        cxt.closePath();
+                        //月球圆心坐标
+                        var x = 30*Math.cos((time*360/this.revolution-90)*Math.PI/180);
+                        var y = 30*Math.sin((time*360/this.revolution-90)*Math.PI/180);
+                        cxt.rotate(time*360/this.revolution*Math.PI/180);
+                        //月球的渐变颜色
+                        var gradientM = cxt.createRadialGradient(x,y,0,x,y,this.r);
+                        gradientM.addColorStop(0,this.strartColor);
+                        gradientM.addColorStop(1,this.endColor);
+                        cxt.fillStyle = gradientM;
+                        //绘制月球
+                        cxt.beginPath();
+                        cxt.arc(x,y,this.r,0,2*Math.PI,false);
+                        cxt.closePath();
+                        cxt.fill();
+                        cxt.restore();
+                    }else{
+                        cxt.rotate(time*360/this.revolution*Math.PI/180); //每次重画星球转动量 //角度 * Math.PI/180
+                        cxt.arc(this.x,this.y,this.r,0,2*Math.PI,false);
+                        cxt.fill();
+                    }
+                    cxt.closePath();
+                    cxt.restore(); //重置画布
+                    //字体
+                    cxt.save();
+                    cxt.translate(500,500);
+                    cxt.fillStyle = "#fff";
+                    cxt.font = "bold " + 0.9*this.r + "px Arial";
+                    cxt.textAlign = "center";
+                    cxt.textBaseline = "middle";
+                    if(this.name=="太阳"){
+                        cxt.fillText(this.name,this.x,this.y);
+                    }else if(this.name=="月球"){
+                        cxt.fillText("",this.x,this.y);
+                    }else{
+                        cxt.fillText(this.name,this.x+50,this.y);
+                    }
+                    //cxt.fillText(this.name,this.x+50,this.y);
+                    cxt.restore();
+                }
+            }
+
+            function moveStar(){
+                cxt.clearRect(0,0,1000,1000);   //首先清除画布
+                starRoute();
+                var Sun = new Star('太阳',0,0,25,'#ffff00','#ff9900',0);
+                var Mercury = new Star('水星',0,-55,8,'#a69697','#5c3e40',87.70);   //水星
+                var Venus = new Star('金星',0,-110,13,'#c4bbac','#1f1315',224.701);  //金星
+                var Earth = new Star('地球',0,-165,18,'#78b1e8','#050c12',365.2422); //地球
+                var Moon = new Star('月球',0,-195,6,'#a69697','#5c3e40',27.32); //月球
+                var Mars = new Star('火星',0,-220,10,'#cec9b6','#76422d',686.98); //火星
+                var Jupier = new Star('木星',0,-275,25,'#c0a48e','#322222',4332.589); //木星
+                var Saturn = new Star('土星',0,-330,23,'#f7f9e3','#5c4533',10759.5); //土星
+                var Uranus = new Star('天王星',0,-385,20,'#a7e1e5','#19243a',30799.095); //天王星
+                var Neptune = new Star('海王星',0,-440,20,'#0661b2','#1e3b73',60152); //海王星
+                Sun.drawStar();
+                Mercury.drawStar();
+                Venus.drawStar();
+                Earth.drawStar();
+                Moon.drawStar();
+                Mars.drawStar();
+                Jupier.drawStar();
+                Saturn.drawStar();
+                Uranus.drawStar();
+                Neptune.drawStar();
+                time++;
+            }
+            moveStar
+            setInterval(moveStar,100)
         }
         draw();
         // 
